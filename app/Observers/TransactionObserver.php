@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\TransactionStatus;
 use App\Exceptions\TransactionImmutableException;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Log;
@@ -50,7 +51,7 @@ class TransactionObserver
      */
     public function updating(Transaction $transaction): bool
     {
-        if ($transaction->getOriginal('status') === 'completed') {
+        if ($transaction->getOriginal('status') === TransactionStatus::Completed) {
             throw new TransactionImmutableException();
         }
 

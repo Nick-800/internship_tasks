@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\TransactionStatus;
+use App\Enums\TransactionType;
 use App\Events\FundsTransferred;
 use App\Exceptions\InsufficientFundsException;
 use App\Exceptions\SelfTransferException;
@@ -42,8 +44,8 @@ class WalletService
                 'source_wallet_id'      => null,          // deposits have no source
                 'destination_wallet_id' => $wallet->id,
                 'amount'                => $amount,
-                'type'                  => 'deposit',
-                'status'                => 'completed',
+                'type'                  => TransactionType::Deposit,
+                'status'                => TransactionStatus::Completed,
                 'description'           => $description,
             ]);
         });
@@ -105,8 +107,8 @@ class WalletService
                 'source_wallet_id'      => $source->id,
                 'destination_wallet_id' => $destination->id,
                 'amount'                => $amount,
-                'type'                  => 'transfer',
-                'status'                => 'completed',
+                'type'                  => TransactionType::Transfer,
+                'status'                => TransactionStatus::Completed,
                 'description'           => $description,
             ]);
         });
