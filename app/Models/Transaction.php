@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Observers\TransactionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,5 +49,23 @@ class Transaction extends Model
     public function destinationWallet(): BelongsTo
     {
         return $this->belongsTo(Wallet::class, 'destination_wallet_id');
+    }
+
+    /**
+     * Scope: filter transactions received by a wallet.
+     * Aligns with the (destination_wallet_id, created_at) composite index.
+     */
+    public function scopeForDestinationWallet(Builder $query, int $walletId): Builder
+    {
+        return $query->where('destination_wallet_id', $walletId);
+    }
+
+    /**
+     * Scope: filter transactions sent from a wallet.
+     * Aligns with the (source_wallet_id, created_at) composite index.
+     */
+    public function scopeForSourceWallet(Builder $query, int $walletId): Builder
+    {
+        return $query->where('source_wallet_id', $walletId);
     }
 }

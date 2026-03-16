@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\WalletNotFoundException;
 use App\Http\Requests\DepositRequest;
+use App\Models\Transaction;
 use App\Models\Wallet;
 use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +21,7 @@ class WalletController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $wallet = Wallet::with(['user', 'transactions' => fn ($q) => $q->latest()->limit(20)])
+        $wallet = Wallet::with(['user', 'transactions' => fn ($q) => $q->forDestinationWallet($id)->latest()->limit(20)])
             ->find($id);
 
         if (! $wallet) {
@@ -71,7 +72,7 @@ class WalletController extends Controller
             throw new WalletNotFoundException();
         }
 
-        $transactions = $wallet->transactions()->latest()->paginate(15);
+        $transactions = Transaction::forDestinationWallet($id)->latest()->paginate(15);
 
         return response()->json($transactions);
     }
