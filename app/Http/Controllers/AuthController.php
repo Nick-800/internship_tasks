@@ -24,20 +24,20 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $user = DB::transaction(function () use ($request): User {
+        ['user' => $user, 'wallet' => $wallet] = DB::transaction(function () use ($request): array {
             $user = User::create([
-                'name'     => $request->name,
-                'email'    => $request->email,
+                'name' => $request->name,
+                'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
 
-            Wallet::create([
-                'user_id'  => $user->id,
-                'balance'  => 0.00,
+            $wallet = Wallet::create([
+                'user_id' => $user->id,
+                'balance' => 0.00,
                 'currency' => strtoupper($request->input('currency', 'USD')),
             ]);
 
-            return $user;
+            return compact('user', 'wallet');
         });
 
         // Fired AFTER the transaction commits — listener won't run if the
@@ -47,11 +47,11 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Registration successful.',
-            'user'    => [
-                'id'     => $user->id,
-                'name'   => $user->name,
-                'email'  => $user->email,
-                'wallet' => $user->load('wallets')->wallets->first(),
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'wallet' => $wallet,
             ],
         ], 201);
     }

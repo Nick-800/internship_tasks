@@ -6,6 +6,7 @@ use App\Events\FundsTransferred;
 use App\Events\UserRegistered;
 use App\Listeners\SendTransferNotification;
 use App\Listeners\SendWelcomeEmail;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
@@ -33,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Model::preventLazyLoading(! app()->isProduction());
+
         // UserRegistered → welcome email
         Event::listen(UserRegistered::class, SendWelcomeEmail::class);
 
